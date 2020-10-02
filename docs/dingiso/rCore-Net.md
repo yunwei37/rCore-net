@@ -34,7 +34,7 @@ connect ： 与远程 endpoint 连接 ，通过设置remote_endpoint, Tcp需要�
 
 bind ： 将 socket 绑定一个本地的 ip
 
-listen ： 如果没有listen，就开启listen，否则不操作
+listen ： 如果没有listen对应的端口，就开启listen，否则不操作
 
 shutdown : 关闭socket
 
@@ -78,9 +78,22 @@ Tcp State :   [enum] 由 rfc 793 规定的 11 种状态
 * should_close() 时间戳大于关闭期限 返回 true
 * poll_at 返回 socket 下一次被 poll 的时间
 
+### TcpSocket
 
+* struct 主要包括一下内容
+  * 两个buffer 存储 接受的内容和要发送的内容
+  * state  ：保存socket 的状态
+  * timer ：用于计时
+  * assembler ：缓冲区的 重新组装
+  * addr 及 endpoint : 本地ip及接口和 远程的 ip 及 接口
+  * seq_no  : Tcp中的 sequence number
+  * ack ： ack码
+  * win ： Tcp 的发送窗口相关内容
+* listen  :  开始监听本机相应端口，open会返回 illegal ， 端口为0 则返回 unaddressable
+* connect :  跟远程endpoint连接，端口期望给出，否则分配一个 49152-65535 端口
+* close ：关闭全双工连接的传输部分
 
-问题：
+##### 问题：
 
 * TcpSocketState的 write函数， 第二个参数  `_send_to_endpoint` 并没有使用， 提了 issue [[Bug Report] wrong of fn write in the TcpSocketState](https://github.com/rcore-os/rCore/issues/69)  
 
